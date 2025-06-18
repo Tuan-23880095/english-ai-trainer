@@ -32,7 +32,7 @@ class ChatService:
     @staticmethod
     def chat(user_text: str) -> str:
         resp = client.chat.completions.create(     # <-- interface mới
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": ChatService.SYSTEM_PROMPT},
                 {"role": "user",   "content": user_text},
@@ -40,7 +40,7 @@ class ChatService:
         )
         return resp.choices[0].message.content.strip()
 
-    @staticmethod
+    @staticmethod2
     def dictionary(word: str) -> dict:
         definition = ChatService.chat(
             f"Explain the English word \"{word}\" and give one example sentence."
@@ -58,7 +58,7 @@ class AIService:
             "Return JSON: {score:0-10, feedback:'...'}"
         )
         resp = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4.1-mini",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},      # yêu cầu JSON
         )
