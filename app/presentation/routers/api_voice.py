@@ -48,3 +48,22 @@ async def voice_api(
     conv_repo.add_message(user_id=user.id, session_id=session_id, role="ai", text=answer)
     db.close()
     return {"user": text, "answer": answer, "session_id": session_id}
+
+# ========================
+# API lấy lại lịch sử hội thoại
+# ========================
+@router.get("/voice/history")
+async def get_history(user=Depends(simple_auth), session_id: str = None):
+    db = SessionLocal()
+    conv_repo = ConversationRepoSQL(db)
+    messages = conv_repo.get_history(user_id=user.id, session_id=session_id)
+    db.close()
+    return [
+        {
+            "timestamp": str(m.timestamp),
+            "role": m.role,
+            "text": m.text,
+            "session_id": m.session_id,
+        }
+        for m in messages
+    ]
