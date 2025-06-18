@@ -48,7 +48,7 @@ async function ai_conversation_loop() {
             const res = await fetch("/api/voice", {
                 method: "POST",
                 headers: getVoiceHeaders(true), // truyền session_id + Content-Type
-                body: JSON.stringify({ prompt: "Bạn hãy bắt đầu huấn luyện tiếng anh" })
+                body: JSON.stringify({ prompt: "You are a friendly English tutor (you can use Vietnamese if needed) and you start the conversation. Please always answer concisely and shortly, no more than 2 sentences." })
             });
             if (!res.ok) throw new Error(await res.text());
             const data = await res.json();
