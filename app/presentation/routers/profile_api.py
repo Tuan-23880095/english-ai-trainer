@@ -11,7 +11,7 @@ router = APIRouter(prefix="/me", tags=["profile"])
 
 # Định nghĩa schema Pydantic để validate dữ liệu gửi lên
 class ProfileUpdate(BaseModel):
-    full_name: str
+    fullname: str
     dob:       date = Field(..., description="DD-MM-YYYY")
     hobbies:   str
     phone:     str

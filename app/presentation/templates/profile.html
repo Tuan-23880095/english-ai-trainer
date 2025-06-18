@@ -4,7 +4,7 @@
 
 <h2>Hoàn thiện hồ sơ</h2>
 <form id="pf">
-  <input name="full_name" placeholder="Họ tên" required value="{{ user.full_name or '' }}"><br/>
+  <input name="fullname" placeholder="Họ tên" required value="{{ user.fullname or '' }}"><br/>
   <input name="dob" type="date" required value="{{ user.dob or '' }}"><br/>
   <input name="phone" placeholder="Điện thoại" required value="{{ user.phone or '' }}"><br/>
   <textarea name="hobbies" placeholder="Sở thích">{{ user.hobbies or '' }}</textarea><br/>

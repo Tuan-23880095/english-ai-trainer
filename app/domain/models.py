@@ -18,7 +18,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, unique=True, nullable=False, index=True)
     hashed_password = Column(String, nullable=False)
-    full_name = Column(String)
+    fullname = Column(String)
     dob = Column(String)         # Có thể dùng Date nếu muốn (Column(Date))
     hobbies = Column(String)
     phone = Column(String)
@@ -50,7 +50,7 @@ class Result(Base):
 class UserSchema(BaseModel):
     id: Optional[int]
     email: EmailStr
-    full_name: Optional[str]
+    fullname: Optional[str]
     dob: Optional[str]
     hobbies: Optional[str]
     phone: Optional[str]
@@ -62,13 +62,13 @@ class UserSchema(BaseModel):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
-    full_name: Optional[str]
+    fullname: Optional[str]
     dob: Optional[str]
     hobbies: Optional[str]
     phone: Optional[str]
 
 class UserUpdate(BaseModel):
-    full_name: Optional[str]
+    fullname: Optional[str]
     dob: Optional[str]
     hobbies: Optional[str]
     phone: Optional[str]

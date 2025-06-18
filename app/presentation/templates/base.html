@@ -10,7 +10,7 @@
   <a href="#" id="logoutBtn">Đăng xuất</a>
 </nav>
 
-<h2>Chào mừng, {{ user.full_name or user.email }}</h2>
+<h2>Chào mừng, {{ user.fullname or user.email }}</h2>
 <ul>
   <li><b>Email:</b> {{ user.email }}</li>
   <li><b>Sinh nhật:</b> {{ user.dob or '—' }}</li>

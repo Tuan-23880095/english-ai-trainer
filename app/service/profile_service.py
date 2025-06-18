@@ -13,7 +13,7 @@ class ProfileService:
         """
         return self.repo.update_profile(
             user_id=user_id,
-            full_name=data.get('full_name'),
+            fullname=data.get('fullname'),
             dob=data.get('dob'),
             phone=data.get('phone'),
             hobbies=data.get('hobbies')

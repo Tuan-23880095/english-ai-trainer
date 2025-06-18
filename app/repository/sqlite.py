@@ -17,7 +17,7 @@ class _UserORM(Base):
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    full_name = Column(String)
+    fullname = Column(String)
     dob = Column(String)
     phone = Column(String)
     hobbies = Column(String)
@@ -45,7 +45,7 @@ def _to_user(u: _UserORM) -> User:
         id=u.id,
         email=u.email,
         hashed_password=u.hashed_password,
-        full_name=u.full_name,
+        fullname=u.fullname,
         dob=u.dob,
         phone=u.phone,
         hobbies=u.hobbies,
@@ -84,10 +84,10 @@ class UserRepoSQL(IUserRepo):
         self.db.add(row); self.db.commit(); self.db.refresh(row)
         return _to_user(row)
      
-    def update_profile(self, user_id, full_name, dob, phone, hobbies):
+    def update_profile(self, user_id, fullname, dob, phone, hobbies):
         user = self.db.query(_UserORM).filter(_UserORM.id == user_id).first()
         if user:
-            user.full_name = full_name
+            user.fullname = fullname
             user.dob = dob
             user.phone = phone
             user.hobbies = hobbies
