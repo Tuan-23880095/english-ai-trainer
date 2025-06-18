@@ -1,29 +1,33 @@
 # app/presentation/routers/profile_api.py
-from datetime import date
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, HTTPException
 from pydantic import BaseModel, Field
+from datetime import date
 
 from app.shared.security import simple_auth
-from app.repository.memory import UserRepoMem
+from app.repository.sqlite import SessionLocal, UserRepoSQL
 from app.service.profile_service import ProfileService
 
-repo = UserRepoMem()
-svc  = ProfileService(repo)
+router = APIRouter(prefix="/me", tags=["profile"])
 
-api  = APIRouter(prefix="/me", tags=["profile"])
-
-
-class _Profile(BaseModel):
+# Định nghĩa schema Pydantic để validate dữ liệu gửi lên
+class ProfileUpdate(BaseModel):
     full_name: str
-    dob:       date = Field(..., description="YYYY-MM-DD")
+    dob:       date = Field(..., description="DD-MM-YYYY")
     hobbies:   str
     phone:     str
 
-router = api      # <── export chính thức
-__all__ = ["router"]
+@router.put("/", summary="Cập nhật hồ sơ cá nhân")
+async def update_profile_endpoint(body: ProfileUpdate, user=Depends(simple_auth)):
+    """
+    Cập nhật thông tin hồ sơ cá nhân cho user hiện tại
+    """
+    db = SessionLocal()
+    repo = UserRepoSQL(db)
+    svc  = ProfileService(repo)
+    updated_user = svc.update_profile(user.id, body.model_dump())
+    db.close()
+    if updated_user:
+        return {"success": True, "msg": "Cập nhật thành công"}
+    raise HTTPException(status_code=400, detail="Lỗi cập nhật hồ sơ")
 
-@router.put("/", summary="Save profile")
-def save_profile(body: _Profile, user = Depends(simple_auth)):
-    svc.update(user.id, **body.model_dump())
-    return {"ok": True}
 # --- cuối file ---
