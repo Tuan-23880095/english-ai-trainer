@@ -1,12 +1,13 @@
-// /static/js/voice.js
+import { startRecording, resetSessionTimeout, stopSessionTimeout } from "/static/js/recorder.js";
+
 let isSpeaking = false; // Đánh dấu trạng thái AI đang nói
+
 function speakText(text) {
     return new Promise(resolve => {
         if (speechSynthesis.speaking) speechSynthesis.cancel();
         let utter = new SpeechSynthesisUtterance(text);
         utter.lang = "en-US";
         isSpeaking = true;
-        // Disable nút "Bắt đầu thực hành nói"
         document.getElementById("start").disabled = true;
         utter.onend = () => {
             isSpeaking = false;
@@ -17,14 +18,14 @@ function speakText(text) {
     });
 }
 
-import { startRecording, resetSessionTimeout, stopSessionTimeout } from "/static/js/recorder.js";
-
+// Lấy header xác thực user
 function getAuthHeaders() {
     const email = sessionStorage.getItem("email");
     const password = sessionStorage.getItem("password");
     return { "x-email": email, "x-password": password };
 }
 
+// Các biến tham chiếu giao diện
 const btn = document.getElementById("start");
 const stat = document.getElementById("status");
 const conv = document.getElementById("conversation");
@@ -33,7 +34,7 @@ let first = true;
 let sessionActive = false;
 let sessionId = null;
 
-// Hàm lấy headers cho mọi fetch hội thoại, luôn có session_id
+// Hàm lấy headers cho hội thoại (luôn có session_id)
 function getVoiceHeaders(isJson = false) {
     const headers = {
         ...getAuthHeaders(),
@@ -43,13 +44,10 @@ function getVoiceHeaders(isJson = false) {
     return headers;
 }
 
-function speakText(text) {
-    return new Promise(resolve => {
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = "en-US";
-        utter.onend = resolve;
-        speechSynthesis.speak(utter);
-    });
+// Hàm chỉ cho ghi âm khi AI đã nói xong
+async function tryStartRecording() {
+    if (isSpeaking) return; // Không ghi nếu AI đang nói
+    await startRecording();
 }
 
 function endSession() {
@@ -57,6 +55,8 @@ function endSession() {
     stopSessionTimeout();
     stat.textContent = "💤 Kết thúc hội thoại (user im lặng >30s)";
 }
+
+// --------- TỪ VỰNG NỔI BẬT ----------
 async function fetchKeywords(conversation) {
     const res = await fetch("/api/keywords", {
         method: "POST",
@@ -105,11 +105,11 @@ async function updateKeywords() {
     }
     document.getElementById('keywords').innerHTML = html;
 
-    // Gán sự kiện cho nút "Lưu từ" và "Phát âm" sau khi render html
+    // Sự kiện cho nút Lưu từ và Phát âm
     document.querySelectorAll('.save-word-btn').forEach(btn => {
         btn.onclick = function() {
             alert("Đã lưu từ: " + btn.dataset.word);
-            // ...hoặc xử lý lưu thực tế vào localStorage/database...
+            // ... hoặc xử lý lưu vào localStorage/database...
         }
     });
     document.querySelectorAll('.play-word-btn').forEach(btn => {
@@ -120,6 +120,7 @@ async function updateKeywords() {
     });
 }
 
+// --------- VÒNG LẶP HỘI THOẠI AI ---------
 async function ai_conversation_loop() {
     if (!sessionActive) return;
     if (first) {
@@ -127,15 +128,14 @@ async function ai_conversation_loop() {
         try {
             const res = await fetch("/api/voice", {
                 method: "POST",
-                headers: getVoiceHeaders(true), // truyền session_id + Content-Type
+                headers: getVoiceHeaders(true),
                 body: JSON.stringify({ prompt: "You are a friendly English tutor (you can use Vietnamese if needed) and you start the conversation. Please always answer concisely and shortly, no more than 2 sentences." })
             });
             if (!res.ok) throw new Error(await res.text());
             const data = await res.json();
             conv.innerHTML += `<p class="ai"><b>AI:</b> ${data.answer}</p>`;
-            // Lấy lại session_id từ response nếu backend sinh mới (optional)
             if (data.session_id) sessionId = data.session_id;
-            await speakText(data.answer);
+            await speakText(data.answer);  // <-- AI phát âm, disable nút nói
             first = false;
             resetSessionTimeout(endSession);
             await ai_conversation_loop();
@@ -146,6 +146,11 @@ async function ai_conversation_loop() {
         return;
     }
     stat.textContent = "🎤 Đang nghe...";
+    resetSessionTimeout(endSession);
+    // ---- Chỉ cho startRecording khi AI đã nói xong (isSpeaking = false)
+    await tryStartRecording();
+    if (!sessionActive) return;
+    stat.textContent = "⏳ Đang xử lý...";
     resetSessionTimeout(endSession);
     const blob = await startRecording();
     if (!sessionActive) return;
@@ -163,19 +168,21 @@ async function ai_conversation_loop() {
         const data = await res.json();
         conv.innerHTML += `<p class="user"><b>You:</b> ${data.user}</p>`;
         conv.innerHTML += `<p class="ai"><b>AI:</b> ${data.answer}</p>`;
-        if (data.session_id) sessionId = data.session_id; // luôn cập nhật lại nếu backend trả về
+        if (data.session_id) sessionId = data.session_id;
         await speakText(data.answer);
         if (sessionActive) {
             resetSessionTimeout(endSession);
             await ai_conversation_loop();
         }
         stat.textContent = "";
+        await updateKeywords();
     } catch (err) {
         stat.textContent = "❌ " + err.message;
         sessionActive = false;
     }
 }
 
+// Gán cho nút bắt đầu nói
 btn.onclick = () => {
     if (!sessionActive) {
         // Sinh sessionId mới khi bắt đầu hội thoại mới
