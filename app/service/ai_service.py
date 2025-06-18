@@ -73,7 +73,7 @@ class AIService:
             "Return JSON: {score:0-10, feedback:'...'}"
         )
         resp = client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},      # yêu cầu JSON
         )
