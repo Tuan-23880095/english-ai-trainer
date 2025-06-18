@@ -18,6 +18,7 @@
   <li><b>Sở thích:</b> {{ user.hobbies or '—' }}</li>
 </ul>
 <div id="msg" style="min-height:1.2rem;color:green;"></div>
-
+{% block content %}{% endblock %}
+{% block script %}{% endblock %}
 <script src="/static/js/auth.js"></script>
 {% endblock %}
