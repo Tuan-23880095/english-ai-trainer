@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from fastapi import Request
 
 from app.shared.exceptions import AppError
-from app.presentation.routers import auth, page, profile_api, api_keywords_router     # NEW
+from app.presentation.routers import auth, page, profile_api     # NEW
 from app.config.config import get_settings
 settings = get_settings()          # luôn lấy cùng một instance
 from app.presentation.routers import (
@@ -27,7 +27,7 @@ def create_app() -> FastAPI:
     app.include_router(page)
     app.include_router(profile_api)
     app.include_router(api_voice)   # <-- quan trọng !
-    app.include_router(api_keywords_router)
+ 
 
     # === Static files ===
     app.mount(
