@@ -30,6 +30,9 @@ const btn = document.getElementById("start");
 const stat = document.getElementById("status");
 const conv = document.getElementById("conversation");
 
+// Thêm tham chiếu nút gợi ý từ vựng từ DB (phải có trong HTML)
+const btnRefreshKeywords = document.getElementById("refresh-keywords");
+
 let first = true;
 let sessionActive = false;
 let sessionId = null;
@@ -57,6 +60,8 @@ function endSession() {
 }
 
 // --------- TỪ VỰNG NỔI BẬT ----------
+
+// API lấy keywords theo hội thoại đang hiển thị
 async function fetchKeywords(conversation) {
     const res = await fetch("/api/keywords", {
         method: "POST",
@@ -66,21 +71,20 @@ async function fetchKeywords(conversation) {
     const data = await res.json();
     return data.keywords || [];
 }
-async function updateKeywords() {
-    let text = [...document.querySelectorAll("#conversation p")]
-        .map(p => p.textContent)
-        .join("\n")
-        .trim();
 
-    if (!text) {
-        document.getElementById('keywords').innerHTML = "<em>Chưa có hội thoại để trích xuất từ vựng.</em>";
-        return;
-    }
+// API lấy keywords từ DB (hội thoại gần nhất)
+async function fetchKeywordsFromDB() {
+    const res = await fetch("/api/keywords_from_db", {
+        headers: getAuthHeaders()
+    });
+    const data = await res.json();
+    return data.keywords || [];
+}
 
-    const keywords = await fetchKeywords(text);
-
+// Hàm render lại khung từ vựng
+function renderKeywords(keywords) {
     let html = '';
-    if (keywords.length === 0) {
+    if (!keywords || keywords.length === 0) {
         html = "<em>Không tìm thấy từ vựng nổi bật trong hội thoại này.</em>";
     } else {
         for (const k of keywords) {
@@ -109,7 +113,6 @@ async function updateKeywords() {
     document.querySelectorAll('.save-word-btn').forEach(btn => {
         btn.onclick = function() {
             alert("Đã lưu từ: " + btn.dataset.word);
-            // ... hoặc xử lý lưu vào localStorage/database...
         }
     });
     document.querySelectorAll('.play-word-btn').forEach(btn => {
@@ -118,6 +121,29 @@ async function updateKeywords() {
             audio.play();
         }
     });
+}
+
+// update theo hội thoại hiện tại trên giao diện
+async function updateKeywords() {
+    let text = [...document.querySelectorAll("#conversation p")]
+        .map(p => p.textContent)
+        .join("\n")
+        .trim();
+    if (!text) {
+        renderKeywords([]);
+        return;
+    }
+    const keywords = await fetchKeywords(text);
+    renderKeywords(keywords);
+}
+
+// Sự kiện khi bấm "Gợi ý từ DB"
+if (btnRefreshKeywords) {
+    btnRefreshKeywords.onclick = async () => {
+        document.getElementById('keywords').innerHTML = "<em>Đang lấy từ vựng từ lịch sử gần nhất...</em>";
+        const keywords = await fetchKeywordsFromDB();
+        renderKeywords(keywords);
+    };
 }
 
 // --------- VÒNG LẶP HỘI THOẠI AI ---------
@@ -135,7 +161,7 @@ async function ai_conversation_loop() {
             const data = await res.json();
             conv.innerHTML += `<p class="ai"><b>AI:</b> ${data.answer}</p>`;
             if (data.session_id) sessionId = data.session_id;
-            await speakText(data.answer);  // <-- AI phát âm, disable nút nói
+            await speakText(data.answer);
             first = false;
             resetSessionTimeout(endSession);
             await ai_conversation_loop();
@@ -147,7 +173,6 @@ async function ai_conversation_loop() {
     }
     stat.textContent = "🎤 Đang nghe...";
     resetSessionTimeout(endSession);
-    // ---- Chỉ cho startRecording khi AI đã nói xong (isSpeaking = false)
     await tryStartRecording();
     if (!sessionActive) return;
     stat.textContent = "⏳ Đang xử lý...";
@@ -162,7 +187,7 @@ async function ai_conversation_loop() {
         const res = await fetch("/api/voice", {
             method: "POST",
             body: fd,
-            headers: getVoiceHeaders() // chỉ truyền session_id, không cần Content-Type
+            headers: getVoiceHeaders()
         });
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
@@ -185,7 +210,6 @@ async function ai_conversation_loop() {
 // Gán cho nút bắt đầu nói
 btn.onclick = () => {
     if (!sessionActive) {
-        // Sinh sessionId mới khi bắt đầu hội thoại mới
         sessionId = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString());
         first = true;
         sessionActive = true;
