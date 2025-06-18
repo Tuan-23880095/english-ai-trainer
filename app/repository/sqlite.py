@@ -17,6 +17,10 @@ class _UserORM(Base):
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    full_name = Column(String)
+    dob = Column(String)
+    phone = Column(String)
+    hobbies = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class _ExerciseORM(Base):
@@ -36,9 +40,17 @@ class _ResultORM(Base):
     submitted_at = Column(DateTime, default=datetime.utcnow)
 
 # ---------- Helper chuyển đổi ----------
-def _to_user(u: _UserORM) -> User:   # …tương tự cho Exercise/Result
-    return User(id=u.id, email=u.email,
-                hashed_password=u.hashed_password, created_at=u.created_at)
+def _to_user(u: _UserORM) -> User:
+    return User(
+        id=u.id,
+        email=u.email,
+        hashed_password=u.hashed_password,
+        full_name=u.full_name,
+        dob=u.dob,
+        phone=u.phone,
+        hobbies=u.hobbies,
+        created_at=u.created_at
+    )
 
 # -------------------------------------------------
 def _to_ex(ex: _ExerciseORM) -> Exercise:
@@ -71,6 +83,18 @@ class UserRepoSQL(IUserRepo):
         row = _UserORM(email=user.email, hashed_password=user.hashed_password)
         self.db.add(row); self.db.commit(); self.db.refresh(row)
         return _to_user(row)
+     
+    def update_profile(self, user_id, full_name, dob, phone, hobbies):
+        user = self.db.query(_UserORM).filter(_UserORM.id == user_id).first()
+        if user:
+            user.full_name = full_name
+            user.dob = dob
+            user.phone = phone
+            user.hobbies = hobbies
+            self.db.commit()
+            self.db.refresh(user)
+            return _to_user(user)
+        return None
 
 # ExerciseRepoSQL – triển khai IExerciseRepo
 # -------------------------------------------------
