@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Thông tin cá nhân{% endblock %}
 {% block body %}
-<script>
-  // Kiểm tra đăng nhập ngay khi vào trang
-  const email = sessionStorage.getItem("email");
-  const password = sessionStorage.getItem("password");
-  if (!email || !password) location.href = "/";
-</script>
 
 <h2>Hoàn thiện hồ sơ</h2>
 <form id="pf">
