@@ -106,3 +106,29 @@ form button:hover{background:#0052a3}
 #conversation p{margin:.25rem 0}
 #conversation .ai   {color:#0066cc}
 #conversation .user {font-weight:600}
+
+/* ============ Voice Chat Page Layout ============ */
+.flex-row {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.voice-col-main {
+  flex: 2 1 0%;
+}
+.voice-col-side {
+  flex: 1 0 300px;
+  border-left: 1px solid #ddd;
+  padding-left: 1.5rem;
+  background: #fcfcff;
+  min-height: 400px;
+  max-width: 340px;
+}
+#keywords .vocab-word {
+  margin-bottom: 1.5em;
+  padding-bottom: .7em;
+  border-bottom: 1px solid #e0e0e0;
+}
+#keywords b { color: #0066cc; }
+#keywords i { color: #555; }
+#keywords span { color: #29743c; font-weight: 500; }
