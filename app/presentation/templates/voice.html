@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Voice Chat{% endblock %}
+{% block content %}
+<h2>Luyện nói tiếng Anh với AI</h2>
+<button id="start">🎤 Bắt đầu ghi âm</button>
+<p id="status"></p>
+<div id="conversation"></div>
+{% endblock %}
+{% block script %}
+<script type="module" src="/static/js/voice.js"></script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Đăng ký tài khoản{% endblock %}
+{% block body %}
+<h2>Đăng ký tài khoản</h2>
+<form id="signupForm">
+  <input name="email"    required placeholder="Email"/><br/>
+  <input name="password" required placeholder="Password" type="password"/><br/>
+  <button>Đăng ký</button>
+</form>
+<div id="msg"></div>
+<script src="/static/js/auth.js"></script>
+<!--<script src="/static/js/auth.js"></script>-->
+{% endblock %}

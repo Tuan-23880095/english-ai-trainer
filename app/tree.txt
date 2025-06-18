@@ -1,0 +1,111 @@
+Folder PATH listing
+Volume serial number is F69B-8B28
+C:.
+¦   main.py
+¦   tree.txt
+¦   __init__.py
+¦   
++---config
+¦   ¦   config.py
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---__pycache__
+¦           config.cpython-312.pyc
+¦           __init__.cpython-312.pyc
+¦           
++---domain
+¦   ¦   models.py
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---__pycache__
+¦           models.cpython-312.pyc
+¦           __init__.cpython-312.pyc
+¦           
++---presentation
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---routers
+¦   ¦   ¦   api_voice.py
+¦   ¦   ¦   app_page.py
+¦   ¦   ¦   auth.py
+¦   ¦   ¦   exercise.py
+¦   ¦   ¦   home.py
+¦   ¦   ¦   page.py
+¦   ¦   ¦   profile_api.py
+¦   ¦   ¦   __init__.py
+¦   ¦   ¦   
+¦   ¦   +---__pycache__
+¦   ¦           api_voice.cpython-312.pyc
+¦   ¦           app_page.cpython-312.pyc
+¦   ¦           auth.cpython-312.pyc
+¦   ¦           exercise.cpython-312.pyc
+¦   ¦           home.cpython-312.pyc
+¦   ¦           page.cpython-312.pyc
+¦   ¦           profile_api.cpython-312.pyc
+¦   ¦           __init__.cpython-312.pyc
+¦   ¦           
+¦   +---static
+¦   ¦   +---css
+¦   ¦   ¦       style.css
+¦   ¦   ¦       
+¦   ¦   +---js
+¦   ¦           auth.js
+¦   ¦           dictionary.js
+¦   ¦           exercise.js
+¦   ¦           nav.js
+¦   ¦           recorder.js
+¦   ¦           voice.js
+¦   ¦           
+¦   +---templates
+¦   ¦       base.html
+¦   ¦       dictionary.html
+¦   ¦       exercise.html
+¦   ¦       index.html
+¦   ¦       layout.html
+¦   ¦       profile.html
+¦   ¦       signup.html
+¦   ¦       voice.html
+¦   ¦       
+¦   +---__pycache__
+¦           __init__.cpython-312.pyc
+¦           
++---repository
+¦   ¦   abc.py
+¦   ¦   memory.py
+¦   ¦   sqlite.py
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---__pycache__
+¦           abc.cpython-312.pyc
+¦           memory.cpython-312.pyc
+¦           sqlite.cpython-312.pyc
+¦           __init__.cpython-312.pyc
+¦           
++---service
+¦   ¦   ai_service.py
+¦   ¦   auth_service.py
+¦   ¦   exercise_service.py
+¦   ¦   profile_service.py
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---__pycache__
+¦           ai_service.cpython-312.pyc
+¦           auth_service.cpython-312.pyc
+¦           exercise_service.cpython-312.pyc
+¦           profile_service.cpython-312.pyc
+¦           __init__.cpython-312.pyc
+¦           
++---shared
+¦   ¦   exceptions.py
+¦   ¦   security.py
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---__pycache__
+¦           exceptions.cpython-312.pyc
+¦           security.cpython-312.pyc
+¦           __init__.cpython-312.pyc
+¦           
++---__pycache__
+        main.cpython-312.pyc
+        __init__.cpython-312.pyc
+        

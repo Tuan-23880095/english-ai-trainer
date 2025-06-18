@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}Trang chính{% endblock %}
+{% block body %}
+<script>
+  // Kiểm tra đăng nhập
+  const email = sessionStorage.getItem("email");
+  const password = sessionStorage.getItem("password");
+  if (!email || !password) location.href = "/";
+</script>
+
+<nav>
+  <a href="/voice">Voice</a> |
+  <a href="/dictionary">Dictionary</a> |
+  <a href="/exercise">Exercise</a> |
+  <a href="/profile">Cá nhân</a> |
+  <a href="#" id="logout">Đăng xuất</a>
+</nav>
+
+<h2>Chào mừng, {{ user.full_name or user.email }}</h2>
+<ul>
+  <li><b>Email:</b> {{ user.email }}</li>
+  <li><b>Sinh nhật:</b> {{ user.dob or '—' }}</li>
+  <li><b>Điện thoại:</b> {{ user.phone or '—' }}</li>
+  <li><b>Sở thích:</b> {{ user.hobbies or '—' }}</li>
+</ul>
+<div id="msg" style="min-height:1.2rem;color:green;"></div>
+<script>
+document.getElementById("logout").onclick = () => {
+  sessionStorage.removeItem("email");
+  sessionStorage.removeItem("password");
+  location.href = "/";
+};
+</script>
+{% endblock %}

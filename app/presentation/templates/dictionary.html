@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Dictionary{% endblock %}
+{% block content %}
+<h2>Tra Từ Điển</h2>
+<input id="word" placeholder="Type a word…" autofocus>
+<button id="lookup">Tra cứu</button>
+<pre id="result"></pre>
+{% endblock %}
+{% block script %}
+<script type="module" src="/static/js/dictionary.js"></script>
+{% endblock %}

@@ -1,0 +1,27 @@
+<!-- app\presentation\templates\index.html-->
+{% extends "layout.html" %}
+{% block title %}Đăng nhập{% endblock %}
+{% block body %}
+<h1>English-AI-Trainer 👋</h1>
+
+{% if request.query_params.get("msg") %}
+<p style="color:green">{{ request.query_params.get("msg") }}</p>
+{% endif %}
+
+<div style="display:flex;gap:3rem;align-items:flex-start">
+  <section>
+    <h2>Đăng nhập</h2>
+    <form id="loginForm">
+      <input name="email"    placeholder="Email"    required /><br/>
+      <input name="password" placeholder="Password" required type="password"/><br/>
+      <button>Đăng nhập</button>
+    </form>
+    <div id="msg"></div>
+  </section>
+  <section>
+    <h2>Chưa có tài khoản?</h2>
+    <a href="/signup">Tạo tài khoản mới →</a>
+  </section>
+</div>
+<script src="/static/js/auth.js"></script>
+{% endblock %}

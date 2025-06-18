@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Exercise{% endblock %}
+{% block content %}
+<h2>Bài tập tiếng Anh</h2>
+<ul id="list">
+  {% for ex in ex_list %}
+    <li>
+      <strong>{{ ex.prompt }}</strong><br>
+      <textarea id="answer-{{ ex.id }}"></textarea>
+      <button onclick="submit('{{ ex.id }}')">Nộp bài</button>
+      <div id="feedback-{{ ex.id }}"></div>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}
+{% block script %}
+<script type="module" src="/static/js/exercise.js"></script>
+{% endblock %}
