@@ -65,7 +65,6 @@ async function updateKeywords() {
     if (keywords.length === 0) {
         html = "<em>Không tìm thấy từ vựng nổi bật trong hội thoại này.</em>";
     } else {
-        // ----- Đặt đoạn code này ở đây -----
         for (const k of keywords) {
             html += `
                 <div class="vocab-word" title="Nhấn vào để lưu từ này">
@@ -88,7 +87,7 @@ async function updateKeywords() {
     }
     document.getElementById('keywords').innerHTML = html;
 
-    // Bổ sung xử lý sự kiện cho nút sau khi render html (nếu cần)
+    // Gán sự kiện cho nút "Lưu từ" và "Phát âm" sau khi render html
     document.querySelectorAll('.save-word-btn').forEach(btn => {
         btn.onclick = function() {
             alert("Đã lưu từ: " + btn.dataset.word);
@@ -102,7 +101,6 @@ async function updateKeywords() {
         }
     });
 }
-
 
 async function ai_conversation_loop() {
     if (!sessionActive) return;
