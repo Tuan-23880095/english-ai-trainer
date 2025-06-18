@@ -167,3 +167,29 @@ form button:hover { background: #0052a3 }
 #keywords b { color: #0066cc; }
 #keywords i { color: #555; }
 #keywords span { color: #29743c; font-weight: 500; }
+
+
+.vocab-word {
+    background: #eefaff;
+    border-radius: 10px;
+    margin-bottom: 1.2em;
+    padding: 1em;
+    transition: box-shadow .2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+.vocab-word:hover {
+    box-shadow: 0 4px 16px rgba(0,102,204,.08);
+}
+.save-word-btn,
+.play-word-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+}
+.save-word-btn:hover span,
+.play-word-btn:hover span {
+    color: #d33;
+    font-weight: bold;
+}
+
