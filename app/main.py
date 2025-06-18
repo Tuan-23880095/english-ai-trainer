@@ -1,4 +1,6 @@
 # app/main.py
+from app.repository.sqlite import migrate
+migrate()
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
