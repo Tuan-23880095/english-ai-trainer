@@ -1,36 +1,93 @@
- # app/domain/models.py
-from __future__ import annotations
+# app/domain/models.py
+
+from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, Field, EmailStr
-from app.config.config import get_settings
-settings = get_settings()          # luôn lấy cùng một instance
+from typing import Optional
+from pydantic import BaseModel, EmailStr
+
+# ORM base
+Base = declarative_base()
+
+# ---------------------------
+# ORM models (làm việc với DB)
+# ---------------------------
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String)
+    dob = Column(String)         # Có thể dùng Date nếu muốn (Column(Date))
+    hobbies = Column(String)
+    phone = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
-class User(BaseModel):
-    id: Optional[int] = None
+class Exercise(Base):
+    __tablename__ = "exercises"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    prompt = Column(String, nullable=False)       # câu hỏi/bài tập
+    answer = Column(String, nullable=False)       # đáp án chuẩn
+    created_by = Column(Integer, nullable=False)  # user id (admin/teacher)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Result(Base):
+    __tablename__ = "results"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    exercise_id = Column(Integer, ForeignKey("exercises.id"))
+    score = Column(Float)
+    feedback = Column(String)                     # phản hồi AI
+    submitted_at = Column(DateTime, default=datetime.utcnow)
+
+# ---------------------------
+# Pydantic models (dùng cho API)
+# ---------------------------
+
+class UserSchema(BaseModel):
+    id: Optional[int]
     email: EmailStr
-    hashed_password: str
-    full_name: Optional[str] = None
-    dob:       Optional[datetime] = None   # import date từ datetime
-    hobbies:   Optional[str] = None
-    phone:     Optional[str] = None
+    full_name: Optional[str]
+    dob: Optional[str]
+    hobbies: Optional[str]
+    phone: Optional[str]
+    created_at: Optional[datetime]
 
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    class Config:
+        orm_mode = True
 
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: Optional[str]
+    dob: Optional[str]
+    hobbies: Optional[str]
+    phone: Optional[str]
 
-class Exercise(BaseModel):
-    id: Optional[int] = None
-    prompt: str                   # câu hỏi/bài tập
-    answer: str                   # đáp án chuẩn
-    created_by: int               # user id (admin/teacher)
+class UserUpdate(BaseModel):
+    full_name: Optional[str]
+    dob: Optional[str]
+    hobbies: Optional[str]
+    phone: Optional[str]
 
-class Result(BaseModel):
-    id: Optional[int] = None
+class ExerciseSchema(BaseModel):
+    id: Optional[int]
+    prompt: str
+    answer: str
+    created_by: int
+    created_at: Optional[datetime]
+    class Config:
+        orm_mode = True
+
+class ResultSchema(BaseModel):
+    id: Optional[int]
     user_id: int
     exercise_id: int
     score: float
-    feedback: str                 # phản hồi AI
-    submitted_at: datetime = Field(default_factory=datetime.utcnow)
-
+    feedback: str
+    submitted_at: Optional[datetime]
+    class Config:
+        orm_mode = True
