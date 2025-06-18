@@ -1,4 +1,6 @@
 // /static/js/voice.js
+let isSpeaking = false; // Đánh dấu trạng thái AI đang nói
+
 import { startRecording, resetSessionTimeout, stopSessionTimeout } from "/static/js/recorder.js";
 
 function getAuthHeaders() {
