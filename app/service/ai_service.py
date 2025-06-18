@@ -31,7 +31,7 @@ class ChatService:
 
     @staticmethod
     def chat(user_text: str) -> str:
-        resp = client.chat.completions.create(     # <-- interface mới
+        resp = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": ChatService.SYSTEM_PROMPT},
@@ -40,12 +40,27 @@ class ChatService:
         )
         return resp.choices[0].message.content.strip()
 
-    @staticmethod2
+    @staticmethod
     def dictionary(word: str) -> dict:
         definition = ChatService.chat(
             f"Explain the English word \"{word}\" and give one example sentence."
         )
         return {"word": word, "definition": definition}
+
+    @staticmethod
+    def WRITE(user_text: str, response_format=None) -> str:
+        params = dict(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Bạn là trợ lý học tiếng Anh, luôn trả lời đúng định dạng JSON."},
+                {"role": "user", "content": user_text}
+            ]
+        )
+        if response_format:
+            params["response_format"] = response_format
+        resp = client.chat.completions.create(**params)
+        return resp.choices[0].message.content.strip()
+
 
 
 # ---------- Scoring / Evaluation ----------
