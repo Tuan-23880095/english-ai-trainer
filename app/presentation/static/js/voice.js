@@ -1,5 +1,21 @@
 // /static/js/voice.js
 let isSpeaking = false; // Đánh dấu trạng thái AI đang nói
+function speakText(text) {
+    return new Promise(resolve => {
+        if (speechSynthesis.speaking) speechSynthesis.cancel();
+        let utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "en-US";
+        isSpeaking = true;
+        // Disable nút "Bắt đầu thực hành nói"
+        document.getElementById("start").disabled = true;
+        utter.onend = () => {
+            isSpeaking = false;
+            document.getElementById("start").disabled = false;
+            resolve();
+        };
+        speechSynthesis.speak(utter);
+    });
+}
 
 import { startRecording, resetSessionTimeout, stopSessionTimeout } from "/static/js/recorder.js";
 
