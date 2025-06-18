@@ -1,12 +1,12 @@
 // app/presentation/static/js/recorder.js
 // /static/js/recorder.js
 
-const MAX_SILENCE = 6000;    // 3 giây: user im lặng >3s thì kết thúc ghi câu
-const SESSION_TIMEOUT = 40000; // 10 giây: user im lặng >40s thì end hội thoại
+const MAX_SILENCE = 6000;    // 6 giây: user im lặng >3s thì kết thúc ghi câu
+const SESSION_TIMEOUT = 30000; // 40 giây: user im lặng >30s thì end hội thoại
 
 let sessionTimeout;
 
-// Hàm ghi âm 1 lượt, trả về blob khi user im lặng >3s
+// Hàm ghi âm 1 lượt, trả về blob khi user im lặng >6s
 export function startRecording() {
     return new Promise(async (resolve, reject) => {
         if (!navigator.mediaDevices) return reject("Trình duyệt không hỗ trợ ghi âm!");
