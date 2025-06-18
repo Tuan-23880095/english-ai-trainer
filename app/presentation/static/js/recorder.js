@@ -1,66 +1,59 @@
 // app/presentation/static/js/recorder.js
-async function submit(exId){
-  const txt = document.getElementById(`answer-${exId}`).value
-  const r = await fetch(`/exercise/${exId}/answer`,{
-      method:'POST',
-      body:new URLSearchParams({text:txt}),
-      headers:{'Authorization':'Bearer '+localStorage.token}
-  })
-  const data = await r.json()
-  document.getElementById(`feedback-${exId}`).innerText =
-       `Score ${data.score}/10 — ${data.feedback}`
-  speechSynthesis.speak(new SpeechSynthesisUtterance(data.feedback))
+// /static/js/recorder.js
+
+const MAX_SILENCE = 3000;    // 3 giây: user im lặng >3s thì kết thúc ghi câu
+const SESSION_TIMEOUT = 10000; // 10 giây: user im lặng >10s thì end hội thoại
+
+let sessionTimeout;
+
+// Hàm ghi âm 1 lượt, trả về blob khi user im lặng >3s
+export function startRecording() {
+    return new Promise(async (resolve, reject) => {
+        if (!navigator.mediaDevices) return reject("Trình duyệt không hỗ trợ ghi âm!");
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        let chunks = [];
+        recorder.ondataavailable = e => chunks.push(e.data);
+
+        recorder.onstop = () => {
+            stream.getTracks().forEach(track => track.stop());
+            resolve(new Blob(chunks, { type: 'audio/webm' }));
+        };
+
+        // Phát hiện im lặng để tự động stop
+        const audioCtx = new AudioContext();
+        const src = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        src.connect(analyser);
+
+        let silenceMs = 0, lastVol = 1000;
+        function checkSilence() {
+            let data = new Uint8Array(analyser.fftSize);
+            analyser.getByteTimeDomainData(data);
+            let max = Math.max(...data);
+            let min = Math.min(...data);
+            let vol = max - min;
+            if (vol < 8) silenceMs += 200;
+            else silenceMs = 0;
+            if (silenceMs >= MAX_SILENCE) recorder.stop();
+            else setTimeout(checkSilence, 200);
+        }
+
+        recorder.start();
+        checkSilence();
+    });
 }
-/*  static/js/recorder.js
-    Ghi âm micro tới khi phát hiện 3s im lặng.
-    Trả về Promise<Blob> (audio/webm)
-*/
-export async function startRecording() {
-  // xin quyền mic
-  const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
-  const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-  const audioChunks   = [];
 
-  // Phân tích âm lượng
-  const audioCtx = new AudioContext();
-  const source   = audioCtx.createMediaStreamSource(stream);
-  const analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 2048;
-  source.connect(analyser);
-  const pcmData = new Float32Array(analyser.fftSize);
-
-  let silenceMs = 0;
-  const SILENCE_THRESHOLD = 0.01;   // RMS < 1 %
-  const MAX_SILENCE = 3000;         // 3 giây
-
-  // hàm kiểm RMS & dừng khi im lặng đủ lâu
-  const detectSilence = (time) => {
-    analyser.getFloatTimeDomainData(pcmData);
-    const rms = Math.sqrt(pcmData.reduce((s, v) => s + v * v, 0) / pcmData.length);
-
-    if (rms < SILENCE_THRESHOLD) {
-      silenceMs += 100;             // step = 100 ms
-      if (silenceMs >= MAX_SILENCE && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();       // kết thúc
-        return;                     // ngừng loop
-      }
-    } else {
-      silenceMs = 0;                // reset nếu có tiếng
-    }
-    // lặp lại
-    if (mediaRecorder.state === "recording")
-      setTimeout(detectSilence, 100);
-  };
-
-  return new Promise((resolve) => {
-    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      audioCtx.close();           // giải phóng
-      const blob = new Blob(audioChunks, { type: "audio/webm" });
-      resolve(blob);
-      stream.getTracks().forEach(t => t.stop());
-    };
-    mediaRecorder.start();
-    detectSilence();              // kick-off vòng lặp RMS
-  });
+// Reset lại session timeout (gọi khi AI trả lời hoặc user vừa nói xong)
+export function resetSessionTimeout(onEndSession) {
+    if (sessionTimeout) clearTimeout(sessionTimeout);
+    sessionTimeout = setTimeout(() => {
+        if (onEndSession) onEndSession();
+    }, SESSION_TIMEOUT);
 }
+
+export function stopSessionTimeout() {
+    if (sessionTimeout) clearTimeout(sessionTimeout);
+    sessionTimeout = null;
+}
+
