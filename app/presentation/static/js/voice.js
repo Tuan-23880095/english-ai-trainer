@@ -49,40 +49,60 @@ async function fetchKeywords(conversation) {
     return data.keywords || [];
 }
 async function updateKeywords() {
-    // Lấy toàn bộ hội thoại dưới dạng text
     let text = [...document.querySelectorAll("#conversation p")]
         .map(p => p.textContent)
         .join("\n")
         .trim();
 
-    // Nếu chưa có hội thoại, không gọi API
     if (!text) {
         document.getElementById('keywords').innerHTML = "<em>Chưa có hội thoại để trích xuất từ vựng.</em>";
         return;
     }
 
-    // Gọi API lấy từ khóa
     const keywords = await fetchKeywords(text);
 
-    // Tạo HTML hiển thị từ vựng
     let html = '';
     if (keywords.length === 0) {
         html = "<em>Không tìm thấy từ vựng nổi bật trong hội thoại này.</em>";
     } else {
+        // ----- Đặt đoạn code này ở đây -----
         for (const k of keywords) {
             html += `
-                <div class="vocab-word">
-                    <b>${k.word}</b> <i>/${k.ipa}/</i><br>
-                    <span>${k.meaning}</span><br>
-                    <audio src="${k.voice}" controls></audio><br>
-                    <em>Ví dụ:</em> ${k.example}
+                <div class="vocab-word" title="Nhấn vào để lưu từ này">
+                    <div style="display:flex; align-items:center; gap:0.6em;">
+                        <b>${k.word}</b>
+                        <i>/${k.ipa}/</i>
+                        <button class="save-word-btn" data-word="${k.word}" title="Lưu từ vựng">
+                            <span style="color:#0066cc;">☆</span>
+                        </button>
+                        <button class="play-word-btn" data-voice="${k.voice}" title="Nghe phát âm">
+                            <span style="color:#4b2;">🔊</span>
+                        </button>
+                    </div>
+                    <span class="meaning" style="color:#29743c;font-weight:500;" title="Nghĩa tiếng Việt">${k.meaning}</span><br>
+                    <em>Ví dụ:</em> <span title="Câu ví dụ">${k.example}</span>
                     <hr>
                 </div>
             `;
         }
     }
     document.getElementById('keywords').innerHTML = html;
+
+    // Bổ sung xử lý sự kiện cho nút sau khi render html (nếu cần)
+    document.querySelectorAll('.save-word-btn').forEach(btn => {
+        btn.onclick = function() {
+            alert("Đã lưu từ: " + btn.dataset.word);
+            // ...hoặc xử lý lưu thực tế vào localStorage/database...
+        }
+    });
+    document.querySelectorAll('.play-word-btn').forEach(btn => {
+        btn.onclick = function() {
+            let audio = new Audio(btn.dataset.voice);
+            audio.play();
+        }
+    });
 }
+
 
 async function ai_conversation_loop() {
     if (!sessionActive) return;
