@@ -68,7 +68,7 @@ async function signupHandler(evt) {
     if (res.ok) {
       showMsg("✅ Đăng ký thành công!", "success");
       setTimeout(() => {
-        redirectTo("/menu");
+        redirectTo("/");
       }, 500);
     } else {
       showMsg("❌ " + (data.detail || "Email đã tồn tại!"));
