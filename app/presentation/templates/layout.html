@@ -1,12 +1,20 @@
-<!-- layout.html: Template gốc -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>{% block title %}English-AI-Trainer{% endblock %}</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <meta charset="UTF-8">
+    <title>{% block title %}23880095-Nhập môn công nghệ phần mềm{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  {% block body %}{% endblock %}
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="https://hcmus.edu.vn/wp-content/uploads/2023/04/Logo-chinh-e1681638380305.png" alt="Logo" class="logo-img"/>
+            <span class="logo-text">23880095 NMCNPM</span>
+        </div>
+        <!-- Nếu cần, thêm các link menu hoặc user info vào đây -->
+    </nav>
+    <div class="center-container">
+        {% block body %}{% endblock %}
+    </div>
 </body>
 </html>
