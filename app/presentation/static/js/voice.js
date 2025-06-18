@@ -37,7 +37,7 @@ function speakText(text) {
 function endSession() {
     sessionActive = false;
     stopSessionTimeout();
-    stat.textContent = "💤 Kết thúc hội thoại (user im lặng >40s)";
+    stat.textContent = "💤 Kết thúc hội thoại (user im lặng >30s)";
 }
 
 async function ai_conversation_loop() {
