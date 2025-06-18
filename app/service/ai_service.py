@@ -27,7 +27,7 @@ class WhisperService:
 
 # ---------- ChatGPT ----------
 class ChatService:
-    SYSTEM_PROMPT = "You are a friendly English tutor (can say Vietnamese). Please always answer concisely and shortly, no more than 2 sentences."
+    SYSTEM_PROMPT = "You are a friendly English tutor (you can use Vietnamese if needed) and you start the conversation. Please always answer concisely and shortly, no more than 2 sentences."
 
     @staticmethod
     def chat(user_text: str) -> str:
