@@ -3,26 +3,9 @@
 //------------------------------------------------------------
 const API = {
   login: "/auth/login",
-  register: "/auth/register"
+  register: "/auth/register",
+  logout: "/auth/logout"
 };
-
-//------------------------------------------------------------
-//  Lưu credentials vào sessionStorage (chỉ lưu tạm cho phiên làm việc)
-//------------------------------------------------------------
-function setCreds(email, pwd) {
-  sessionStorage.setItem("email", email);
-  sessionStorage.setItem("password", pwd);
-}
-function clearCreds() {
-  sessionStorage.removeItem("email");
-  sessionStorage.removeItem("password");
-}
-function getEmail() {
-  return sessionStorage.getItem("email");
-}
-function getPassword() {
-  return sessionStorage.getItem("password");
-}
 
 //------------------------------------------------------------
 //  Hàm tiện ích hiển thị thông báo
@@ -32,6 +15,13 @@ function showMsg(msg, type = "error") {
   if (!el) return;
   el.textContent = msg;
   el.style.color = (type === "success" ? "green" : "red");
+}
+
+//------------------------------------------------------------
+//  Redirect đơn giản (cookies sẽ tự động được gửi)
+//------------------------------------------------------------
+function redirectTo(url) {
+  window.location.href = url;
 }
 
 //------------------------------------------------------------
@@ -49,17 +39,15 @@ async function loginHandler(evt) {
     });
     const data = await res.json();
     if (res.ok) {
-      setCreds(form.email, form.password);
       showMsg("✅ Đăng nhập thành công!", "success");
-      setTimeout(() => location.href = "/menu", 500);
+      setTimeout(() => {
+        redirectTo("/menu");
+      }, 500);
     } else {
       showMsg("❌ " + (data.detail || "Đăng nhập thất bại"));
-      // Xoá thông tin cũ tránh lỗi "auto đăng nhập sai"
-      clearCreds();
     }
   } catch (err) {
     showMsg("❌ Lỗi kết nối server!");
-    clearCreds();
   }
 }
 
@@ -78,16 +66,33 @@ async function signupHandler(evt) {
     });
     const data = await res.json();
     if (res.ok) {
-      setCreds(form.email, form.password);
       showMsg("✅ Đăng ký thành công!", "success");
-      setTimeout(() => location.href = "/menu", 500);
+      setTimeout(() => {
+        redirectTo("/menu");
+      }, 500);
     } else {
       showMsg("❌ " + (data.detail || "Email đã tồn tại!"));
-      clearCreds();
     }
   } catch (err) {
     showMsg("❌ Lỗi kết nối server!");
-    clearCreds();
+  }
+}
+
+//------------------------------------------------------------
+//  Gọi API logout
+//------------------------------------------------------------
+async function logoutHandler() {
+  try {
+    const res = await fetch(API.logout, {
+      method: "POST"
+    });
+    if (res.ok) {
+      redirectTo("/");
+    } else {
+      showMsg("❌ Lỗi khi đăng xuất!");
+    }
+  } catch (err) {
+    showMsg("❌ Lỗi kết nối server!");
   }
 }
 
@@ -97,11 +102,14 @@ async function signupHandler(evt) {
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm  = document.getElementById("loginForm");
   const signupForm = document.getElementById("signupForm");
+  const logoutBtn  = document.getElementById("logoutBtn");
+  
   if (loginForm)  loginForm.addEventListener("submit", loginHandler);
   if (signupForm) signupForm.addEventListener("submit", signupHandler);
+  if (logoutBtn)  logoutBtn.addEventListener("click", logoutHandler);
 });
 
 //------------------------------------------------------------
-//  Hàm public: clearCreds (nếu muốn logout)
+//  Hàm public: logout (có thể gọi từ HTML)
 //------------------------------------------------------------
-window.clearCreds = clearCreds;
+window.logout = logoutHandler;
