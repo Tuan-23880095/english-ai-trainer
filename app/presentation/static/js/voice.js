@@ -39,6 +39,50 @@ function endSession() {
     stopSessionTimeout();
     stat.textContent = "💤 Kết thúc hội thoại (user im lặng >30s)";
 }
+async function fetchKeywords(conversation) {
+    const res = await fetch("/api/keywords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversation })
+    });
+    const data = await res.json();
+    return data.keywords || [];
+}
+async function updateKeywords() {
+    // Lấy toàn bộ hội thoại dưới dạng text
+    let text = [...document.querySelectorAll("#conversation p")]
+        .map(p => p.textContent)
+        .join("\n")
+        .trim();
+
+    // Nếu chưa có hội thoại, không gọi API
+    if (!text) {
+        document.getElementById('keywords').innerHTML = "<em>Chưa có hội thoại để trích xuất từ vựng.</em>";
+        return;
+    }
+
+    // Gọi API lấy từ khóa
+    const keywords = await fetchKeywords(text);
+
+    // Tạo HTML hiển thị từ vựng
+    let html = '';
+    if (keywords.length === 0) {
+        html = "<em>Không tìm thấy từ vựng nổi bật trong hội thoại này.</em>";
+    } else {
+        for (const k of keywords) {
+            html += `
+                <div class="vocab-word">
+                    <b>${k.word}</b> <i>/${k.ipa}/</i><br>
+                    <span>${k.meaning}</span><br>
+                    <audio src="${k.voice}" controls></audio><br>
+                    <em>Ví dụ:</em> ${k.example}
+                    <hr>
+                </div>
+            `;
+        }
+    }
+    document.getElementById('keywords').innerHTML = html;
+}
 
 async function ai_conversation_loop() {
     if (!sessionActive) return;
