@@ -3,8 +3,6 @@
 {% block content %}
 <div class="exercise-main-container">
     <h2>English Speaking Assistant</h2>
-    
-    <!-- Chọn chủ đề hội thoại (có thể bỏ nếu muốn đơn giản) -->
     <div style="margin-bottom: 14px;">
       <label for="topic" style="font-weight:500">Chủ đề luyện tập:</label>
       <select id="topic" style="font-size:1em;padding:6px 12px;">
@@ -16,13 +14,10 @@
       </select>
       <button id="btn-new-session" style="margin-left:8px;background:#19a7ce;">Bắt đầu chủ đề mới</button>
     </div>
-
     <div id="status-exercise" style="min-height:1.4em;color:#1b478e;margin-bottom:5px"></div>
     <div class="chatbox" id="chatbox"></div>
-    
     <div id="feedback-vi" style="margin:14px 0 8px 0; color:#c0392b; font-size:1.08em; font-weight:500"></div>
     <div id="vocab-blocks"></div>
-
     <div class="input-area">
         <button class="voice-btn" id="btn-voice">🎤 Nói tiếng Anh</button>
         <button class="tts-btn" id="btn-tts">🔊 Nghe lại</button>
