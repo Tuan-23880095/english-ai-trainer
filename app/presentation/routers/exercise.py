@@ -1,31 +1,53 @@
-from fastapi import APIRouter, Request, Depends, Form
-from fastapi.responses import HTMLResponse, JSONResponse
-from app.repository.sqlite import SessionLocal, ExerciseRepoSQL, ResultRepoSQL
-from app.service.ai_service import AIService
+# app/presentation/routers/exercise.py
+
+from fastapi import APIRouter, Request, Depends
+from fastapi.responses import JSONResponse
 from app.shared.security import simple_auth
-from starlette.templating import Jinja2Templates
+from app.service.ai_service import ChatService
+import json
 
 router = APIRouter(prefix="/exercise", tags=["exercise"])
-templates = Jinja2Templates(directory="app/presentation/templates")
 
-@router.get("/", response_class=HTMLResponse)
-async def get_exercise(request: Request, user=Depends(simple_auth)):
-    db = SessionLocal()
-    ex = ExerciseRepoSQL(db).get_first()
-    db.close()
-    return templates.TemplateResponse("exercise.html", {"request": request, "exercise": ex})
+@router.post("/conversation")
+async def exercise_conversation(request: Request, user=Depends(simple_auth)):
+    """
+    API: Giao tiếp hội thoại luyện nói tiếng Anh (Text-to-Text) với ChatGPT.
+    - Nhận: lịch sử hội thoại (history), input (câu trả lời mới nhất của user).
+    - Trả về:
+        - next_question: câu hỏi gợi ý tiếp theo (tiếng Anh)
+        - feedback_vi: nhận xét/chỉnh sửa bằng tiếng Việt (về ngữ âm, ngữ pháp, từ vựng)
+        - vocab: list từ vựng cần học (hiển thị ở chatbox)
+    """
+    try:
+        data = await request.json()
+        history = data.get("history", [])
+        user_input = data.get("input", "")
 
-@router.post("/{ex_id}/answer")
-async def submit_answer(ex_id: int, request: Request, user=Depends(simple_auth)):
-    data = await request.json()
-    answer = data.get("answer")
-    db = SessionLocal()
-    ex = ExerciseRepoSQL(db).get(ex_id)
-    if not ex:
-        db.close()
-        return JSONResponse({"error": "Bài tập không tồn tại!"}, status_code=404)
-    score, feedback = AIService.evaluate(answer, ex.answer)
+        # 1. Ghép lịch sử hội thoại (system+ai+user...), cộng thêm input mới nhất
+        history_msgs = [{"role": x["role"], "content": x["content"]} for x in history]
+        history_msgs.append({"role": "user", "content": user_input})
 
-    ResultRepoSQL(db).add(user_id=user.id, exercise_id=ex_id, answer=answer, score=score, feedback=feedback)
-    db.close()
-    return JSONResponse({"score": score, "feedback": feedback, "model_answer": ex.answer})
+        # 2. Gọi ChatGPT sinh câu hỏi tiếp theo cho user luyện tập (EN)
+        prompt_next = (
+            "Based on this conversation, ask the learner the next suitable question "
+            "to continue practicing English, using no more than two sentences."
+        )
+        next_question = ChatService.chat_with_history(history_msgs, system_prompt=prompt_next)
+
+        # 3. Gọi ChatGPT để feedback lỗi và gợi ý từ vựng (VI)
+        prompt_feedback = (
+            f"Bạn là giáo viên tiếng Anh. Đây là câu trả lời của học sinh: \"{user_input}\". "
+            "Hãy nhận xét NGẮN GỌN về phát âm/ngữ pháp/từ vựng (bằng tiếng Việt), "
+            "và liệt kê tối đa 3 từ vựng nên học (mỗi từ: từ, nghĩa, ví dụ tiếng Anh). "
+            "Trả về đúng JSON: {\"feedback_vi\": \"...\", \"vocab\":[{\"word\":\"...\",\"meaning\":\"...\",\"example\":\"...\"}]}"
+        )
+        feedback_json = ChatService.chat_json(prompt_feedback)
+
+        # Đảm bảo luôn trả về đúng cấu trúc
+        return {
+            "next_question": next_question,
+            "feedback_vi": feedback_json.get("feedback_vi", ""),
+            "vocab": feedback_json.get("vocab", []),
+        }
+    except Exception as e:
+        return JSONResponse({"error": f"Lỗi xử lý: {str(e)}"}, status_code=500)
