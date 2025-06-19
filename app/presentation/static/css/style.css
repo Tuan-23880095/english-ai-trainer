@@ -199,63 +199,76 @@ form button:hover { background: #0052a3 }
   margin: 2em 0;
 }
 
-.exercise-section {
-  background: #e8f3fd;
-  border-radius: 18px;
-  padding: 32px 32px 20px 32px;
-  margin-bottom: 32px;
-  border: 1.5px solid #bdd8f6;
-  max-width: 600px;
-  min-width: 350px;
-  width: 100%;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.03);
+.exercise-main-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 0 20px 0;
+    background: #f5f5ff;
+    border-radius: 16px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    font-size: 2rem;
+    color: #19477c;
+    letter-spacing: 1px;
+}
+
+.chatbox {
+    border: 1.6px solid #bbb;
+    padding: 22px 22px 14px 22px;
+    height: 270px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 12px;
+    font-size: 1.17em;
+    margin: 0 auto 26px auto;
+    width: 80%;
+    min-width: 340px;
+    max-width: 900px;
+    box-shadow: 0 2px 14px rgba(49,115,255,.04);
 }
 
 .input-area {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    margin: 0 auto;
+    width: 80%;
+    max-width: 900px;
+    min-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.input-area button {
-  font-size: 1.15em;
-  padding: 10px 22px;
-  border-radius: 7px;
-  border: none;
-  background: #1976d2;
-  color: #fff;
-  margin-bottom: 6px;
-  cursor: pointer;
-  transition: background 0.18s;
-}
-.input-area button:hover {
-  background: #145ea8;
-}
-.input-area .tts-btn {
-  background: #d32f2f;
-}
-.input-area .tts-btn:hover {
-  background: #a51414;
-}
 textarea#inputText {
-  font-size: 1.2em;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1.2px solid #bbb;
-  width: 100%;
-  min-height: 48px;
-  box-sizing: border-box;
-}
-#btn-submit {
-  background: #2196f3;
-}
-#btn-submit:hover {
-  background: #1565c0;
+    width: 100%;
+    min-height: 55px;
+    font-size: 1.13em;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.2px solid #bbb;
+    box-sizing: border-box;
+    resize: vertical;
 }
 
-#feedback-block {
-  margin-top: 18px;
-  font-size: 1.09em;
+button {
+    padding: 11px 20px;
+    border: none;
+    border-radius: 7px;
+    margin-right: 8px;
+    background: #3083ff;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background .18s;
 }
+button:disabled { background: #888; }
+.voice-btn { background: #16a34a; }
+.tts-btn { background: #dc2626; }
+button.voice-btn:hover { background: #0d6820; }
+button.tts-btn:hover { background: #b21c1c; }
+button#btn-send { background: #3083ff; margin-right: 0;}
+button#btn-send:hover { background: #1d5ea8; }
 
