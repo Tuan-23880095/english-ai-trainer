@@ -1,17 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Exercise{% endblock %}
 {% block content %}
-<h2>Bài tập tiếng Anh</h2>
-<ul id="list">
-  {% for ex in ex_list %}
-    <li>
-      <strong>{{ ex.prompt }}</strong><br>
-      <textarea id="answer-{{ ex.id }}"></textarea>
-      <button onclick="submit('{{ ex.id }}')">Nộp bài</button>
-      <div id="feedback-{{ ex.id }}"></div>
-    </li>
-  {% endfor %}
-</ul>
+<div class="exercise-container">
+  <h2>English Speaking Exercise</h2>
+  <section class="exercise" style="
+      background: #e8f3fd; border-radius: 12px;
+      padding: 18px 22px 10px 22px; margin-bottom: 20px;
+      border: 1px solid #bdd8f6; max-width: 500px; margin-left:auto; margin-right:auto;">
+    <p>
+      <b>Task:</b> <span id="exercise-prompt">{{ exercise.prompt }}</span>
+    </p>
+    <div class="input-area">
+      <button class="voice-btn" id="btn-voice">🎤 Nói tiếng Anh</button>
+      <button class="tts-btn" id="btn-tts">🔊 Nghe lại</button>
+      <br/><br/>
+      <textarea id="inputText" placeholder="Bạn hãy nói hoặc nhập nội dung..."></textarea>
+      <br/>
+      <button id="btn-submit">Nộp bài</button>
+    </div>
+    <div id="feedback-block" style="margin-top:18px;"></div>
+  </section>
+</div>
 {% endblock %}
 {% block script %}
 <script type="module" src="/static/js/exercise.js"></script>
