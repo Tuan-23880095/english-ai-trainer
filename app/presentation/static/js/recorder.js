@@ -1,7 +1,7 @@
 // app/presentation/static/js/recorder.js
 
 const MAX_SILENCE = 3000;      // 5 giây: user im lặng >5s thì kết thúc ghi câu
-const SESSION_TIMEOUT = 25000; // 20 giây: user im lặng >20s thì end hội thoại
+const SESSION_TIMEOUT = 15000; // 20 giây: user im lặng >20s thì end hội thoại
 
 let sessionTimeout;
 
