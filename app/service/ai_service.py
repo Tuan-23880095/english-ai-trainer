@@ -32,7 +32,7 @@ class ChatService:
     @staticmethod
     def chat(user_text: str) -> str:
         resp = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": ChatService.SYSTEM_PROMPT},
                 {"role": "user",   "content": user_text},
@@ -50,7 +50,7 @@ class ChatService:
     @staticmethod
     def WRITE(user_text: str, response_format=None) -> str:
         params = dict(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "Bạn là trợ lý học tiếng Anh, luôn trả lời đúng định dạng JSON."},
                 {"role": "user", "content": user_text}
