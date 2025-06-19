@@ -191,16 +191,26 @@ async function ai_conversation_loop() {
         });
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
-        conv.innerHTML += `<p class="user"><b>You:</b> ${data.user}</p>`;
-        conv.innerHTML += `<p class="ai"><b>AI:</b> ${data.answer}</p>`;
-        if (data.session_id) sessionId = data.session_id;
-        await speakText(data.answer);
-        if (sessionActive) {
-            resetSessionTimeout(endSession);
-            await ai_conversation_loop();
-        }
-        stat.textContent = "";
-        await updateKeywords();
+
+// --- kiểm tra nội dung user nói có hợp lệ không ---
+if (!data.user || !data.user.trim()) {
+    stat.textContent = "⏸ Không nhận được giọng nói. Hãy thử nói lại rõ hơn!";
+    sessionActive = false; // kết thúc phiên, không gọi lại vòng lặp
+    return;
+}
+
+conv.innerHTML += `<p class="user"><b>You:</b> ${data.user}</p>`;
+conv.innerHTML += `<p class="ai"><b>AI:</b> ${data.answer}</p>`;
+if (data.session_id) sessionId = data.session_id;
+await speakText(data.answer);
+
+if (sessionActive) {
+    resetSessionTimeout(endSession);
+    await ai_conversation_loop();
+}
+stat.textContent = "";
+await updateKeywords();
+
     } catch (err) {
         stat.textContent = "❌ " + err.message;
         sessionActive = false;
