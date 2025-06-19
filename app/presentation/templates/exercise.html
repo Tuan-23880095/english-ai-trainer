@@ -3,12 +3,14 @@
 {% block content %}
 <div class="exercise-container">
   <h2>English Speaking Exercise</h2>
-  <section class="exercise" style="
-      background: #e8f3fd; border-radius: 12px;
-      padding: 18px 22px 10px 22px; margin-bottom: 20px;
-      border: 1px solid #bdd8f6; max-width: 500px; margin-left:auto; margin-right:auto;">
+  <section class="exercise exercise-section">
     <p>
-      <b>Task:</b> <span id="exercise-prompt">{{ exercise.prompt }}</span>
+      <b>Task:</b>
+      {% if exercise %}
+        <span id="exercise-prompt">{{ exercise.prompt }}</span>
+      {% else %}
+        <span style="color:red">Chưa có bài tập nào trong hệ thống!</span>
+      {% endif %}
     </p>
     <div class="input-area">
       <button class="voice-btn" id="btn-voice">🎤 Nói tiếng Anh</button>
@@ -18,7 +20,7 @@
       <br/>
       <button id="btn-submit">Nộp bài</button>
     </div>
-    <div id="feedback-block" style="margin-top:18px;"></div>
+    <div id="feedback-block"></div>
   </section>
 </div>
 {% endblock %}

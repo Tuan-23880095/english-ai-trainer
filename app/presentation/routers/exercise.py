@@ -21,7 +21,11 @@ async def submit_answer(ex_id: int, request: Request, user=Depends(simple_auth))
     answer = data.get("answer")
     db = SessionLocal()
     ex = ExerciseRepoSQL(db).get(ex_id)
+    if not ex:
+        db.close()
+        return JSONResponse({"error": "Bài tập không tồn tại!"}, status_code=404)
     score, feedback = AIService.evaluate(answer, ex.answer)
+
     ResultRepoSQL(db).add(user_id=user.id, exercise_id=ex_id, answer=answer, score=score, feedback=feedback)
     db.close()
     return JSONResponse({"score": score, "feedback": feedback, "model_answer": ex.answer})

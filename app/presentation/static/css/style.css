@@ -192,4 +192,70 @@ form button:hover { background: #0052a3 }
     color: #d33;
     font-weight: bold;
 }
+.exercise-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em 0;
+}
+
+.exercise-section {
+  background: #e8f3fd;
+  border-radius: 18px;
+  padding: 32px 32px 20px 32px;
+  margin-bottom: 32px;
+  border: 1.5px solid #bdd8f6;
+  max-width: 600px;
+  min-width: 350px;
+  width: 100%;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.03);
+}
+
+.input-area {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-area button {
+  font-size: 1.15em;
+  padding: 10px 22px;
+  border-radius: 7px;
+  border: none;
+  background: #1976d2;
+  color: #fff;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.input-area button:hover {
+  background: #145ea8;
+}
+.input-area .tts-btn {
+  background: #d32f2f;
+}
+.input-area .tts-btn:hover {
+  background: #a51414;
+}
+textarea#inputText {
+  font-size: 1.2em;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.2px solid #bbb;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+#btn-submit {
+  background: #2196f3;
+}
+#btn-submit:hover {
+  background: #1565c0;
+}
+
+#feedback-block {
+  margin-top: 18px;
+  font-size: 1.09em;
+}
 
