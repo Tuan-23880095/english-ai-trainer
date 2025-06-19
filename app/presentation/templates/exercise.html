@@ -3,7 +3,25 @@
 {% block content %}
 <div class="exercise-main-container">
     <h2>English Speaking Assistant</h2>
+    
+    <!-- Chọn chủ đề hội thoại (có thể bỏ nếu muốn đơn giản) -->
+    <div style="margin-bottom: 14px;">
+      <label for="topic" style="font-weight:500">Chủ đề luyện tập:</label>
+      <select id="topic" style="font-size:1em;padding:6px 12px;">
+        <option value="Daily Conversation">Daily Conversation</option>
+        <option value="Interview">Interview</option>
+        <option value="Travel">Travel</option>
+        <option value="Education">Education</option>
+        <option value="Random">Random</option>
+      </select>
+      <button id="btn-new-session" style="margin-left:8px;background:#19a7ce;">Bắt đầu chủ đề mới</button>
+    </div>
+
+    <div id="status-exercise" style="min-height:1.4em;color:#1b478e;margin-bottom:5px"></div>
     <div class="chatbox" id="chatbox"></div>
+    
+    <div id="feedback-vi" style="margin:14px 0 8px 0; color:#c0392b; font-size:1.08em; font-weight:500"></div>
+    <div id="vocab-blocks"></div>
 
     <div class="input-area">
         <button class="voice-btn" id="btn-voice">🎤 Nói tiếng Anh</button>
@@ -12,80 +30,19 @@
         <textarea id="inputText" placeholder="Bạn hãy nói hoặc nhập nội dung..."></textarea>
         <br/>
         <button id="btn-send">Send</button>
+        <button id="btn-clear" style="background:#e63946">Xóa hội thoại</button>
+        <button id="btn-history" style="background:#cddc39">Lịch sử</button>
+    </div>
+    <div id="history-modal" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,.3);z-index:9999">
+      <div style="background:#fff;max-width:640px;margin:48px auto;padding:24px 32px;border-radius:12px;position:relative">
+        <b>Lịch sử hội thoại</b>
+        <button onclick="document.getElementById('history-modal').style.display='none'"
+          style="position:absolute;top:16px;right:24px;font-size:1.2em;background:#eee;padding:2px 9px;border-radius:7px">×</button>
+        <div id="history-content" style="margin-top:18px;max-height:350px;overflow:auto;font-size:1.07em;"></div>
+      </div>
     </div>
 </div>
 {% endblock %}
 {% block script %}
-<link rel="stylesheet" href="/static/css/exercise.css">
-<script>
-    // Web Speech API (chỉ Chrome/Edge hỗ trợ tốt)
-    let recognition;
-    function startListening() {
-        if (!('webkitSpeechRecognition' in window)) {
-            alert('Trình duyệt không hỗ trợ speech-to-text!');
-            return;
-        }
-        recognition = new webkitSpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            document.getElementById('inputText').value = transcript;
-            addMessage('Bạn (speech)', transcript);
-        };
-        recognition.onerror = function(event) {
-            alert('Lỗi nhận diện giọng nói: ' + event.error);
-        }
-        recognition.start();
-    }
-
-    function addMessage(who, text) {
-        const chatbox = document.getElementById('chatbox');
-        chatbox.innerHTML += `<b>${who}:</b> ${text}<br>`;
-        chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    function speakText() {
-        const text = document.getElementById('inputText').value;
-        if (text) speak(text);
-    }
-    function speak(text) {
-        if ('speechSynthesis' in window) {
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'en-US';
-            window.speechSynthesis.speak(utter);
-        } else {
-            alert('Trình duyệt không hỗ trợ text-to-speech!');
-        }
-    }
-
-    // Thay đổi: ở đây bạn nên tích hợp gọi API backend thật
-    async function sendMessage() {
-        const text = document.getElementById('inputText').value.trim();
-        if (!text) return;
-        addMessage('Bạn', text);
-
-        // --- Gửi lên backend exercise (ví dụ call API /exercise/conversation) ---
-        // Để demo, vẫn để fakeAIResponse. Khi có API thật, thay hàm này.
-        fakeAIResponse(text);
-        document.getElementById('inputText').value = '';
-    }
-
-    function fakeAIResponse(text) {
-        let response = '';
-        if (text.toLowerCase().includes('hello')) response = "Hi! How are you today?";
-        else if (text.toLowerCase().includes('name')) response = "My name is EnglishBot. Nice to meet you!";
-        else if (text.toLowerCase().includes('weather')) response = "It's sunny and beautiful today!";
-        else response = "That's interesting! Could you tell me more?";
-        setTimeout(() => {
-            addMessage('AI', response);
-            speak(response);
-        }, 600);
-    }
-
-    document.getElementById('btn-voice').onclick = startListening;
-    document.getElementById('btn-tts').onclick = speakText;
-    document.getElementById('btn-send').onclick = sendMessage;
-</script>
+<script type="module" src="/static/js/exercise.js"></script>
 {% endblock %}
