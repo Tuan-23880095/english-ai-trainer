@@ -1,29 +1,91 @@
 {% extends "base.html" %}
 {% block title %}Exercise{% endblock %}
 {% block content %}
-<div class="exercise-container">
-  <h2>English Speaking Exercise</h2>
-  <section class="exercise exercise-section">
-    <p>
-      <b>Task:</b>
-      {% if exercise %}
-        <span id="exercise-prompt">{{ exercise.prompt }}</span>
-      {% else %}
-        <span style="color:red">Chưa có bài tập nào trong hệ thống!</span>
-      {% endif %}
-    </p>
+<div class="exercise-main-container">
+    <h2>English Speaking Assistant</h2>
+    <div class="chatbox" id="chatbox"></div>
+
     <div class="input-area">
-      <button class="voice-btn" id="btn-voice">🎤 Nói tiếng Anh</button>
-      <button class="tts-btn" id="btn-tts">🔊 Nghe lại</button>
-      <br/><br/>
-      <textarea id="inputText" placeholder="Bạn hãy nói hoặc nhập nội dung..."></textarea>
-      <br/>
-      <button id="btn-submit">Nộp bài</button>
+        <button class="voice-btn" id="btn-voice">🎤 Nói tiếng Anh</button>
+        <button class="tts-btn" id="btn-tts">🔊 Nghe lại</button>
+        <br/><br/>
+        <textarea id="inputText" placeholder="Bạn hãy nói hoặc nhập nội dung..."></textarea>
+        <br/>
+        <button id="btn-send">Send</button>
     </div>
-    <div id="feedback-block"></div>
-  </section>
 </div>
 {% endblock %}
 {% block script %}
-<script type="module" src="/static/js/exercise.js"></script>
+<link rel="stylesheet" href="/static/css/exercise.css">
+<script>
+    // Web Speech API (chỉ Chrome/Edge hỗ trợ tốt)
+    let recognition;
+    function startListening() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Trình duyệt không hỗ trợ speech-to-text!');
+            return;
+        }
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('inputText').value = transcript;
+            addMessage('Bạn (speech)', transcript);
+        };
+        recognition.onerror = function(event) {
+            alert('Lỗi nhận diện giọng nói: ' + event.error);
+        }
+        recognition.start();
+    }
+
+    function addMessage(who, text) {
+        const chatbox = document.getElementById('chatbox');
+        chatbox.innerHTML += `<b>${who}:</b> ${text}<br>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function speakText() {
+        const text = document.getElementById('inputText').value;
+        if (text) speak(text);
+    }
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            window.speechSynthesis.speak(utter);
+        } else {
+            alert('Trình duyệt không hỗ trợ text-to-speech!');
+        }
+    }
+
+    // Thay đổi: ở đây bạn nên tích hợp gọi API backend thật
+    async function sendMessage() {
+        const text = document.getElementById('inputText').value.trim();
+        if (!text) return;
+        addMessage('Bạn', text);
+
+        // --- Gửi lên backend exercise (ví dụ call API /exercise/conversation) ---
+        // Để demo, vẫn để fakeAIResponse. Khi có API thật, thay hàm này.
+        fakeAIResponse(text);
+        document.getElementById('inputText').value = '';
+    }
+
+    function fakeAIResponse(text) {
+        let response = '';
+        if (text.toLowerCase().includes('hello')) response = "Hi! How are you today?";
+        else if (text.toLowerCase().includes('name')) response = "My name is EnglishBot. Nice to meet you!";
+        else if (text.toLowerCase().includes('weather')) response = "It's sunny and beautiful today!";
+        else response = "That's interesting! Could you tell me more?";
+        setTimeout(() => {
+            addMessage('AI', response);
+            speak(response);
+        }, 600);
+    }
+
+    document.getElementById('btn-voice').onclick = startListening;
+    document.getElementById('btn-tts').onclick = speakText;
+    document.getElementById('btn-send').onclick = sendMessage;
+</script>
 {% endblock %}
