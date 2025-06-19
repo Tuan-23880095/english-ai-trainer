@@ -42,7 +42,7 @@ async def voice_api(
     text = WhisperService.transcribe(audio_bytes)
     # Lưu message user (nội dung vừa nói)
     conv_repo.add_message(user_id=user.id, session_id=session_id, role="user", text=text)
-    prompt = f"Bạn giúp tôi kiểm tra từ vựng và ngữ pháp: {text}"
+    prompt = f"Please check my grammar and vocabulary: {text}"
     answer = ChatService.chat(prompt)
     # Lưu message AI (trả lời của AI)
     conv_repo.add_message(user_id=user.id, session_id=session_id, role="ai", text=answer)
