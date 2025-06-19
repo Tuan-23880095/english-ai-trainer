@@ -81,3 +81,19 @@ class AIService:
         # SDK 1.x trả về JSON dưới dạng text tại `message.content`
         data = json.loads(resp.choices[0].message.content)
         return data["score"], data["feedback"]
+
+class AIService:
+    @staticmethod
+    def evaluate(answer: str, ground_truth: str):
+        prompt = (
+            f"You are an English teacher. Compare learner answer:\n"
+            f"'{answer}'\nwith correct answer:\n'{ground_truth}'. "
+            "Return JSON: {score:0-10, feedback:'...'}"
+        )
+        resp = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+        )
+        data = json.loads(resp.choices[0].message.content)
+        return data["score"], data["feedback"]
