@@ -2,9 +2,12 @@
 {% block title %}Dictionary{% endblock %}
 {% block content %}
 <h2>Tra Từ Điển</h2>
-<input id="word" placeholder="Type a word…" autofocus>
-<button id="lookup">Tra cứu</button>
-<pre id="result"></pre>
+<div style="max-width:420px;margin:0 auto;">
+  <input id="word" placeholder="Type a word…" autofocus>
+  <button id="lookup">Tra cứu</button>
+  <button id="speak-word" title="Nghe phát âm từ"><span>🔊</span></button>
+  <pre id="result" style="background:#fffbe0; border-radius:7px; margin-top:18px; min-height:110px; font-size:1.04em"></pre>
+</div>
 {% endblock %}
 {% block script %}
 <script type="module" src="/static/js/dictionary.js"></script>
