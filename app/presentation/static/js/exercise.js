@@ -1,49 +1,75 @@
-// app/presentation/static/js/exercise.js
-
-// Hàm tiện ích lấy header xác thực
-function getAuthHeaders() {
-  const email = sessionStorage.getItem("email");
-  const password = sessionStorage.getItem("password");
-  return { "x-email": email, "x-password": password };
+let recognition;
+function startListening() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert('Trình duyệt không hỗ trợ speech-to-text!');
+        return;
+    }
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('inputText').value = transcript;
+        addMessage('Bạn (speech)', transcript);
+    };
+    recognition.onerror = function(event) {
+        alert('Lỗi nhận diện giọng nói: ' + event.error);
+    }
+    recognition.start();
 }
 
-// Hàm nộp bài cho từng bài tập
-window.submit = async function(exId) {
-  const answer = document.getElementById(`answer-${exId}`).value.trim();
-  if (!answer) {
-    document.getElementById(`feedback-${exId}`).innerText = "Bạn chưa nhập câu trả lời!";
-    return;
-  }
-  document.getElementById(`feedback-${exId}`).innerText = "Đang chấm...";
+function addMessage(who, text) {
+    const block = document.getElementById('feedback-block');
+    block.innerHTML += `<b>${who}:</b> ${text}<br>`;
+    block.scrollTop = block.scrollHeight;
+}
 
-  try {
-    // Gửi kèm header xác thực khi nộp bài
-    const res = await fetch(`/exercise/${exId}/answer`, {
-      method: 'POST',
-      headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({ text: answer })
+// Đọc lại
+function speakText() {
+    const text = document.getElementById('inputText').value;
+    if (text) speak(text);
+}
+function speak(text) {
+    if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        window.speechSynthesis.speak(utter);
+    } else {
+        alert('Trình duyệt không hỗ trợ text-to-speech!');
+    }
+}
+
+// Gửi bài cho AI backend chấm điểm
+async function submitAnswer() {
+    const answer = document.getElementById('inputText').value.trim();
+    if (!answer) {
+        alert("Bạn chưa nhập câu trả lời!");
+        return;
+    }
+    document.getElementById('feedback-block').innerHTML = "<i>Đang chấm điểm...</i>";
+    // Lấy exercise_id từ template context (giả sử có id trong exercise)
+    const ex_id = window.exerciseId || 1;
+    // Gửi lên backend chấm điểm
+    const res = await fetch(`/exercise/${ex_id}/answer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer })
     });
     if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.clear();
-        location.href = "/";
+        document.getElementById('feedback-block').innerHTML = "<span style='color:red'>Có lỗi khi chấm bài!</span>";
         return;
-      }
-      throw new Error(await res.text());
     }
     const data = await res.json();
-    document.getElementById(`feedback-${exId}`).innerText =
-      `Score: ${data.score}/10\n${data.feedback}`;
-    // Đọc feedback bằng TTS (nếu muốn)
-    if (data.feedback) {
-      const u = new SpeechSynthesisUtterance(data.feedback);
-      u.lang = "en-US";
-      speechSynthesis.speak(u);
-    }
-  } catch (err) {
-    document.getElementById(`feedback-${exId}`).innerText = "❌ " + err.message;
-  }
-};
+    let fb = `<div style="background:#fff; border-radius:7px; padding:14px 12px; border:1px solid #b6e1fd;">
+        <b>Điểm:</b> <span style="color:#2196f3;">${data.score}/10</span><br>
+        <b>Nhận xét:</b> ${data.feedback} <button onclick="speakTextAI('${data.feedback.replace(/'/g,"\\'")}')">🔊</button><br>
+        <b>Câu mẫu:</b> <i>${data.model_answer || ""}</i>
+        </div>`;
+    document.getElementById('feedback-block').innerHTML = fb;
+}
+window.speakTextAI = function(txt) { speak(txt); }
+
+document.getElementById('btn-voice').onclick = startListening;
+document.getElementById('btn-tts').onclick = speakText;
+document.getElementById('btn-submit').onclick = submitAnswer;
