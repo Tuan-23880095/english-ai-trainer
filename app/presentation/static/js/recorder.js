@@ -37,7 +37,7 @@ export async function startRecording() {
                 let max = Math.max(...data);
                 let min = Math.min(...data);
                 let vol = max - min;
-                if (vol < 10) silenceMs += 200;
+                if (vol < 8) silenceMs += 200;
                 else silenceMs = 0;
                 if (silenceMs >= MAX_SILENCE) {
                     recorder.stop();
